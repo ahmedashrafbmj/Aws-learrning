@@ -1,0 +1,191 @@
+pm2 commands 
+
+sudo apt update
+
+// install node.js
+
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt install -y nodejs
+
+
+install pm2
+
+sudo npm install -g pm2
+
+
+Save the PM2 startup 
+
+pm2 startup
+pm2 save
+
+
+run old pm2 after startup
+
+pm2 resurrect
+
+
+
+run react or next, python, dotnet/.net build on pm2
+
+ pm2 start serve --name rad -- -s build -l 3002 (react)
+
+pm2 start app.py --interpreter python3 (python)
+
+
+pm2 start dotnet --name "xrad-api" -- "PresentationLayer.dll" --urls "http://localhost:5002" (dotnet)
+
+
+
+
+
+ip tables settings
+
+allow port
+
+sudo iptables -A INPUT -p tcp -s <IP_ADDRESS> --dport <PORT> -j ACCEPT
+
+
+ save changes of ip tables
+
+sudo iptables-save | sudo tee /etc/iptables/rules.v4
+
+check allowed ports on iptables
+
+sudo iptables -L -n -v
+
+
+
+
+firewall settings
+
+sudo firewall-cmd --add-port 443/tcp --permanent
+
+if changes not render restart server 
+
+
+
+Install UFW firewall
+
+sudo apt update
+sudo apt install ufw
+
+Allow SSH (port 22):
+sudo ufw allow ssh
+or explicitly:
+sudo ufw allow 22/tcp
+Allow HTTPS (port 443):
+sudo ufw allow https
+
+
+allow tcp:
+sudo ufw allow 3000/tcp
+
+
+enable ufw
+
+sudo ufw enable
+
+check status ufw:
+sudo ufw status
+
+
+
+install nginx 
+
+
+sudo apt update
+sudo apt install nginx
+
+
+sudo systemctl start nginx
+
+
+sudo systemctl enable nginx
+
+
+sudo systemctl status nginx
+
+
+
+sudo ufw allow 'Nginx Full'
+
+
+
+SSL Steps
+
+
+How i ssl your domain:
+-------------------------------------------
+1.sudo apt install certbot python3-certbot-nginx
+2.create a proxy file verify the syntax of your configuration:
+    * sudo nginx -t
+    
+3.Reload Nginx to load the new configuration:
+    * sudo systemctl reload nginx
+    
+4.To additionally let in HTTPS traffic, allow the Nginx Full profile and delete the redundant Nginx HTTP profile allowance:
+    *sudo ufw allow 'Nginx Full'
+    *sudo ufw delete allow 'Nginx HTTP'
+    *sudo ufw status
+    
+    
+5.Obtaining an SSL Certificate:
+ *sudo certbot --nginx -d example.com -d www.example.com
+
+
+6.Verifying Certbot Auto-Renewal:
+    *sudo systemctl status certbot.timer
+    *To test the renewal process, you can do a dry run with certbot:
+        *sudo certbot renew --dry-run		
+
+
+Reverse proxy:
+
+multiple APIS on signle IP
+
+server {
+
+    listen 80;
+
+    server_name 150.230.246.80;
+
+    location / {
+
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+    }  # Closing brace for location block
+
+    location /Center/ {
+        proxy_pass http://localhost:5002/;  # Bind to port 3002
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }  # Closing brace for location /rad block
+
+}  # Closing brace for server block
+
+
+
+####add .htaccess 
+
+
+server {
+        listen 80;
+        listen [::]:80;
+        root /hnh/testing/testbuild/build;mkvirtualenv -p $(pyenv which python) myenv
+
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name cynotech.ga www.cynotech.ga;
+
+        location ~* \.(?:manifest|appcache|html?|xml|json)$ {
+    expires -1;
+    # access_log logs/static.log; # I don't usually include a static log
+  }
