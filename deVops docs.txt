@@ -192,6 +192,11 @@ server {
 
 
 
+// kill app
+pkill -f web_app.py
+
+
+
 
 // pscp zip upload
 pscp -i "C:\path\to\your\key.ppk" "C:\path\to\your\file.zip" username@server_ip:/var/www/your_domain/html/
